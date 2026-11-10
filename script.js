@@ -523,17 +523,40 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.disabled = true;
       submitBtn.innerHTML = `
         <i class="fa-solid fa-spinner fa-spin"></i>
-        <span>Broadcasting across the Final Wall...</span>
+        <span>Transmitting to neilofebrian@gmail.com across the Final Wall...</span>
       `;
 
       playSystemChime(440, 1.2);
 
-      setTimeout(() => {
+      const subjectVal = document.getElementById('subject')?.value.trim() || 'Story Fragment from a Reader';
+      const formData = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        subject: subjectVal,
+        message: messageInput.value.trim(),
+        _subject: `[Star Stream #BI-7623] Story Fragment: ${subjectVal} (From: ${nameInput.value.trim()})`,
+        _captcha: "false",
+        _template: "table"
+      };
+
+      fetch('https://formsubmit.co/ajax/neilofebrian@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
         playSystemChime(880, 2.0);
 
-        formFeedback.textContent = '✨ [Transmission Successful] Your story fragment has penetrated the Final Wall and reached Kim Dokja on the Subway train. Dokkaebi Biyoo says: “Ba-at!”';
+        formFeedback.textContent = '✨ [Transmission Successful] Your story fragment has been sent to neilofebrian@gmail.com and reached Kim Dokja on the Subway train! (Note: If this is the very first submission, FormSubmit will send a 1-click confirmation email to activate your inbox).';
         formFeedback.className = 'form-feedback success';
         formFeedback.style.display = 'block';
 
@@ -541,8 +564,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
           formFeedback.style.display = 'none';
-        }, 8000);
-      }, 1800);
+        }, 12000);
+      })
+      .catch(error => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+        playSystemChime(660, 1.0);
+
+        formFeedback.innerHTML = `
+          <span>Transmission encountered network interference. Click below to send directly from your email:</span><br>
+          <a href="mailto:neilofebrian@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent('Sender: ' + formData.name + ' (' + formData.email + ')\n\n' + formData.message)}" style="color: var(--primary-color); text-decoration: underline; font-weight: bold; margin-top: 0.5rem; display: inline-block;">
+            <i class="fa-solid fa-envelope"></i> Open Email Client to neilofebrian@gmail.com
+          </a>
+        `;
+        formFeedback.className = 'form-feedback success';
+        formFeedback.style.display = 'block';
+      });
     });
   }
 
