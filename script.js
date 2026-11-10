@@ -528,6 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       playSystemChime(440, 1.2);
 
+      const isLocalFile = window.location.protocol === 'file:';
+
       const subjectVal = document.getElementById('subject')?.value.trim() || 'Story Fragment from a Reader';
       const formData = {
         name: nameInput.value.trim(),
@@ -538,6 +540,28 @@ document.addEventListener('DOMContentLoaded', () => {
         _captcha: "false",
         _template: "table"
       };
+
+      if (isLocalFile) {
+        // Local file protocol cannot make CORS requests to FormSubmit
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+        playSystemChime(660, 0.8);
+
+        formFeedback.innerHTML = `
+          <div style="text-align: left; line-height: 1.6;">
+            <strong style="color: #f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Notice (Local File Detected):</strong><br>
+            <span>You are opening this file directly as <code>file:///</code>. Form gateway APIs require a live web server to prevent spam.</span><br>
+            <div style="margin-top: 0.75rem;">
+              <strong>Choose one of these 2 ways to transmit:</strong><br>
+              1. <strong>Use your live online website:</strong> <a href="https://puffilionrawr.github.io/Kim-Dokja/#contact" target="_blank" style="color: var(--primary-color); text-decoration: underline; font-weight: bold;">https://puffilionrawr.github.io/Kim-Dokja/</a><br>
+              2. <strong>Or send directly via email:</strong> <a href="mailto:neilofebrian@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent('Sender: ' + formData.name + ' (' + formData.email + ')\n\n' + formData.message)}" style="color: var(--primary-color); text-decoration: underline; font-weight: bold;"><i class="fa-solid fa-envelope"></i> Open Email App to neilofebrian@gmail.com</a>
+            </div>
+          </div>
+        `;
+        formFeedback.className = 'form-feedback success';
+        formFeedback.style.display = 'block';
+        return;
+      }
 
       fetch('https://formsubmit.co/ajax/neilofebrian@gmail.com', {
         method: 'POST',
@@ -556,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = originalBtnHTML;
         playSystemChime(880, 2.0);
 
-        formFeedback.textContent = '✨ [Transmission Successful] Your story fragment has been sent to neilofebrian@gmail.com and reached Kim Dokja on the Subway train! (Note: If this is the very first submission, FormSubmit will send a 1-click confirmation email to activate your inbox).';
+        formFeedback.textContent = '✨ [Transmission Successful] Your story fragment has been sent to neilofebrian@gmail.com and reached Kim Dokja on the Subway train!';
         formFeedback.className = 'form-feedback success';
         formFeedback.style.display = 'block';
 
