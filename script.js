@@ -25,9 +25,9 @@
    Tinggal isi 3 baris di bawah ini dengan kode dari akun EmailJS Anda:
    ========================================================================== */
 const EMAILJS_CONFIG = {
-  publicKey: '',    // Masukkan Public Key Anda (cth: 'pQ9_AbCdEf123')
-  serviceId: '',    // Masukkan Service ID Anda (cth: 'service_abc123')
-  templateId: '',   // Masukkan Template ID Anda (cth: 'template_xyz789')
+  publicKey: 'ag6JxPRCTGxpS09oW',    // Masukkan Public Key Anda (cth: 'pQ9_AbCdEf123')
+  serviceId: 'Utomo2008*',    // Masukkan Service ID Anda (cth: 'service_abc123')
+  templateId: 'template_bw2w6of',   // Masukkan Template ID Anda (cth: 'template_xyz789')
 };
 
 document.addEventListener('DOMContentLoaded', () => {
