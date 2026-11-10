@@ -19,7 +19,29 @@
 
 'use strict';
 
+/* ==========================================================================
+   EMAILJS CONFIGURATION
+   Kunci EmailJS untuk pengiriman 1-klik di latar belakang tanpa buka tab Gmail.
+   Tinggal isi 3 baris di bawah ini dengan kode dari akun EmailJS Anda:
+   ========================================================================== */
+const EMAILJS_CONFIG = {
+  publicKey: '',    // Masukkan Public Key Anda (cth: 'pQ9_AbCdEf123')
+  serviceId: '',    // Masukkan Service ID Anda (cth: 'service_abc123')
+  templateId: '',   // Masukkan Template ID Anda (cth: 'template_xyz789')
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Inisialisasi EmailJS SDK jika Public Key tersedia
+  if (window.emailjs && EMAILJS_CONFIG.publicKey) {
+    try {
+      emailjs.init({
+        publicKey: EMAILJS_CONFIG.publicKey,
+      });
+    } catch (e) {
+      console.warn('EmailJS initialization warning:', e);
+    }
+  }
 
   /* ==========================================
      1. WEB AUDIO API SYNTHESIZER
@@ -538,36 +560,102 @@ document.addEventListener('DOMContentLoaded', () => {
       const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(subjectVal)}&body=${encodeURIComponent(formattedBody)}`;
       const mailtoUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(subjectVal)}&body=${encodeURIComponent(formattedBody)}`;
 
-      // Attempt to launch Gmail web compose in a new window/tab
-      const newWin = window.open(gmailComposeUrl, '_blank');
+      const isEmailJSReady = Boolean(
+        EMAILJS_CONFIG.publicKey && 
+        EMAILJS_CONFIG.serviceId && 
+        EMAILJS_CONFIG.templateId &&
+        window.emailjs
+      );
 
-      setTimeout(() => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHTML;
-        playSystemChime(1100, 1.5);
+      if (isEmailJSReady) {
+        // Mode 1: 1-Klik Langsung Terkirim di Latar Belakang via EmailJS SDK
+        const templateParams = {
+          to_email: targetEmail,
+          from_name: senderName,
+          from_email: 'neilofebrian@gmail.com',
+          subject: subjectVal,
+          message: rawMessage,
+          dispatched_channel: '#BI-7623 (Kim Dokja\'s Company)'
+        };
 
-        formFeedback.innerHTML = `
-          <div style="text-align: left; line-height: 1.6;">
-            <strong style="color: var(--primary-light);"><i class="fa-solid fa-circle-check"></i> Transmission Prepared!</strong><br>
-            <span>Pesan dari <strong>neilofebrian@gmail.com</strong> ke <strong>${targetEmail}</strong> telah dibuka di jendela Gmail.</span><br>
-            <span style="font-size: 0.85rem; color: var(--text-secondary);">Cukup klik tombol <strong>Send (Kirim)</strong> di jendela Gmail Anda, dan email akan langsung diterima tanpa perlu aktivasi pihak ketiga!</span>
-            <div style="margin-top: 0.85rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <a href="${gmailComposeUrl}" target="_blank" class="btn btn-sm btn-primary" style="font-size: 0.78rem;">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Ulang di Gmail Web
-              </a>
-              <a href="${mailtoUrl}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem;">
-                <i class="fa-solid fa-envelope"></i> Buka di Aplikasi Mail Komputer
-              </a>
+        emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams)
+          .then((response) => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHTML;
+            playSystemChime(1100, 1.8);
+
+            formFeedback.innerHTML = `
+              <div style="text-align: left; line-height: 1.6;">
+                <strong style="color: var(--primary-light);"><i class="fa-solid fa-circle-check"></i> [1-Click Direct Delivery Successful!]</strong><br>
+                <span>Pesan telah berhasil dikirim langsung di latar belakang ke <strong>${targetEmail}</strong> dari <code>neilofebrian@gmail.com</code> tanpa membuka tab Gmail!</span>
+              </div>
+            `;
+            formFeedback.className = 'form-feedback success';
+            formFeedback.style.display = 'block';
+
+            contactForm.reset();
+            document.getElementById('name').value = 'Kim Dokja (via Neilo)';
+            document.getElementById('subject').value = '[Star Stream] A Story Fragment Has Arrived for You';
+
+            setTimeout(() => {
+              formFeedback.style.display = 'none';
+            }, 12000);
+          })
+          .catch((error) => {
+            console.error('EmailJS Error:', error);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHTML;
+            playSystemChime(660, 0.8);
+
+            formFeedback.innerHTML = `
+              <div style="text-align: left; line-height: 1.6;">
+                <strong style="color: #f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Pengiriman Gagal: ${error.text || error.message || 'Periksa Key EmailJS'}</strong><br>
+                <span>Sebagai alternatif instan, gunakan jendela pengiriman Gmail di bawah ini:</span><br>
+                <div style="margin-top: 0.65rem;">
+                  <a href="${gmailComposeUrl}" target="_blank" class="btn btn-sm btn-primary" style="font-size: 0.78rem;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka & Kirim via Gmail
+                  </a>
+                </div>
+              </div>
+            `;
+            formFeedback.className = 'form-feedback success';
+            formFeedback.style.display = 'block';
+          });
+      } else {
+        // Mode 2: Kunci EmailJS belum dimasukkan, gunakan jendela Gmail Compose
+        const newWin = window.open(gmailComposeUrl, '_blank');
+
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHTML;
+          playSystemChime(1100, 1.5);
+
+          formFeedback.innerHTML = `
+            <div style="text-align: left; line-height: 1.6;">
+              <strong style="color: var(--primary-light);"><i class="fa-solid fa-circle-check"></i> Jendela Gmail Dibuka!</strong><br>
+              <span>Pesan dari <strong>neilofebrian@gmail.com</strong> ke <strong>${targetEmail}</strong> telah disiapkan di jendela Gmail. Klik <strong>Send</strong> di tab Gmail Anda.</span><br>
+              <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed rgba(0, 229, 255, 0.2); font-size: 0.8rem; color: #fbbf24;">
+                <i class="fa-solid fa-key"></i> <strong>Ingin 1-klik langsung terkirim tanpa buka tab Gmail?</strong><br>
+                Masukkan Public Key, Service ID, dan Template ID dari EmailJS ke baris 26-28 di <code>script.js</code>!
+              </div>
+              <div style="margin-top: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <a href="${gmailComposeUrl}" target="_blank" class="btn btn-sm btn-primary" style="font-size: 0.78rem;">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Ulang di Gmail Web
+                </a>
+                <a href="${mailtoUrl}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem;">
+                  <i class="fa-solid fa-envelope"></i> Buka di Aplikasi Mail
+                </a>
+              </div>
             </div>
-          </div>
-        `;
-        formFeedback.className = 'form-feedback success';
-        formFeedback.style.display = 'block';
+          `;
+          formFeedback.className = 'form-feedback success';
+          formFeedback.style.display = 'block';
 
-        contactForm.reset();
-        document.getElementById('name').value = 'Kim Dokja (via Neilo)';
-        document.getElementById('subject').value = '[Star Stream] A Story Fragment Has Arrived for You';
-      }, 900);
+          contactForm.reset();
+          document.getElementById('name').value = 'Kim Dokja (via Neilo)';
+          document.getElementById('subject').value = '[Star Stream] A Story Fragment Has Arrived for You';
+        }, 800);
+      }
     });
   }
 
