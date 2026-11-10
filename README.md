@@ -50,7 +50,7 @@ Comprehensive profile dossiers for all core comrades:
 ### 6. 🎮 Interactive Easter Eggs
 - **The 49% vs 51% Toggle:** Switch reality between the Earth Returnee (49%) and the Ancient Dream Subway passenger (51%).
 - **Coin Sponsorship Simulator:** Transmit coins to Kim Dokja's channel with dokkaebi audio chimes and real-time counter updates.
-- **Transmit Story Fragment:** Form transmitting messages across Worldline #1864 directly to the subway train beyond the Final Wall, seamlessly routed to **neilofebrian@gmail.com** via FormSubmit AJAX endpoint.
+- **Transmit Story Fragment:** Form transmitting messages across Worldline #1864 directly from **neilofebrian@gmail.com** to any target recipient email without third-party form activations or middlemen, powered by direct Star Stream Gmail dispatch.
 
 ---
 

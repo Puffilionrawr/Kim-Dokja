@@ -502,18 +502,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!emailInput.value.trim()) {
-        emailError.textContent = 'Star Stream frequency or email is required.';
+        emailError.textContent = 'Target recipient email address is required.';
         isValid = false;
       } else if (!validateEmail(emailInput.value.trim())) {
-        emailError.textContent = 'Please enter a valid email address.';
+        emailError.textContent = 'Please enter a valid target email address.';
         isValid = false;
       }
 
       if (!messageInput.value.trim()) {
-        messageError.textContent = 'Message to Kim Dokja cannot be empty.';
+        messageError.textContent = 'Message to the recipient cannot be empty.';
         isValid = false;
-      } else if (messageInput.value.trim().length < 10) {
-        messageError.textContent = 'Your message must be at least 10 characters long.';
+      } else if (messageInput.value.trim().length < 5) {
+        messageError.textContent = 'Your message must be at least 5 characters long.';
         isValid = false;
       }
 
@@ -523,87 +523,51 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.disabled = true;
       submitBtn.innerHTML = `
         <i class="fa-solid fa-spinner fa-spin"></i>
-        <span>Transmitting to neilofebrian@gmail.com across the Final Wall...</span>
+        <span>Preparing Star Stream Transmission from neilofebrian@gmail.com...</span>
       `;
 
-      playSystemChime(440, 1.2);
+      playSystemChime(880, 1.2);
 
-      const isLocalFile = window.location.protocol === 'file:';
+      const targetEmail = emailInput.value.trim();
+      const senderName = nameInput.value.trim() || 'Kim Dokja (via Neilo)';
+      const subjectVal = document.getElementById('subject')?.value.trim() || '[Star Stream] A Story Fragment Has Arrived';
+      const rawMessage = messageInput.value.trim();
 
-      const subjectVal = document.getElementById('subject')?.value.trim() || 'Story Fragment from a Reader';
-      const formData = {
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        subject: subjectVal,
-        message: messageInput.value.trim(),
-        _subject: `[Star Stream #BI-7623] Story Fragment: ${subjectVal} (From: ${nameInput.value.trim()})`,
-        _captcha: "false",
-        _template: "table"
-      };
+      const formattedBody = `Greetings,\n\nYou have received an official Star Stream story fragment transmitted from neilofebrian@gmail.com:\n\n--------------------------------------------------\n${rawMessage}\n--------------------------------------------------\n\nDispatched By: ${senderName}\nSender Channel: neilofebrian@gmail.com\nStar Stream Nebula: <Kim Dokja's Company> (Channel #BI-7623)`;
 
-      if (isLocalFile) {
-        // Local file protocol cannot make CORS requests to FormSubmit
+      const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(subjectVal)}&body=${encodeURIComponent(formattedBody)}`;
+      const mailtoUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(subjectVal)}&body=${encodeURIComponent(formattedBody)}`;
+
+      // Attempt to launch Gmail web compose in a new window/tab
+      const newWin = window.open(gmailComposeUrl, '_blank');
+
+      setTimeout(() => {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
-        playSystemChime(660, 0.8);
+        playSystemChime(1100, 1.5);
 
         formFeedback.innerHTML = `
           <div style="text-align: left; line-height: 1.6;">
-            <strong style="color: #f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Notice (Local File Detected):</strong><br>
-            <span>You are opening this file directly as <code>file:///</code>. Form gateway APIs require a live web server to prevent spam.</span><br>
-            <div style="margin-top: 0.75rem;">
-              <strong>Choose one of these 2 ways to transmit:</strong><br>
-              1. <strong>Use your live online website:</strong> <a href="https://puffilionrawr.github.io/Kim-Dokja/#contact" target="_blank" style="color: var(--primary-color); text-decoration: underline; font-weight: bold;">https://puffilionrawr.github.io/Kim-Dokja/</a><br>
-              2. <strong>Or send directly via email:</strong> <a href="mailto:neilofebrian@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent('Sender: ' + formData.name + ' (' + formData.email + ')\n\n' + formData.message)}" style="color: var(--primary-color); text-decoration: underline; font-weight: bold;"><i class="fa-solid fa-envelope"></i> Open Email App to neilofebrian@gmail.com</a>
+            <strong style="color: var(--primary-light);"><i class="fa-solid fa-circle-check"></i> Transmission Prepared!</strong><br>
+            <span>Pesan dari <strong>neilofebrian@gmail.com</strong> ke <strong>${targetEmail}</strong> telah dibuka di jendela Gmail.</span><br>
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">Cukup klik tombol <strong>Send (Kirim)</strong> di jendela Gmail Anda, dan email akan langsung diterima tanpa perlu aktivasi pihak ketiga!</span>
+            <div style="margin-top: 0.85rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <a href="${gmailComposeUrl}" target="_blank" class="btn btn-sm btn-primary" style="font-size: 0.78rem;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Ulang di Gmail Web
+              </a>
+              <a href="${mailtoUrl}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem;">
+                <i class="fa-solid fa-envelope"></i> Buka di Aplikasi Mail Komputer
+              </a>
             </div>
           </div>
         `;
         formFeedback.className = 'form-feedback success';
         formFeedback.style.display = 'block';
-        return;
-      }
-
-      fetch('https://formsubmit.co/ajax/neilofebrian@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then(data => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHTML;
-        playSystemChime(880, 2.0);
-
-        formFeedback.textContent = '✨ [Transmission Successful] Your story fragment has been sent to neilofebrian@gmail.com and reached Kim Dokja on the Subway train!';
-        formFeedback.className = 'form-feedback success';
-        formFeedback.style.display = 'block';
 
         contactForm.reset();
-
-        setTimeout(() => {
-          formFeedback.style.display = 'none';
-        }, 12000);
-      })
-      .catch(error => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHTML;
-        playSystemChime(660, 1.0);
-
-        formFeedback.innerHTML = `
-          <span>Transmission encountered network interference. Click below to send directly from your email:</span><br>
-          <a href="mailto:neilofebrian@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent('Sender: ' + formData.name + ' (' + formData.email + ')\n\n' + formData.message)}" style="color: var(--primary-color); text-decoration: underline; font-weight: bold; margin-top: 0.5rem; display: inline-block;">
-            <i class="fa-solid fa-envelope"></i> Open Email Client to neilofebrian@gmail.com
-          </a>
-        `;
-        formFeedback.className = 'form-feedback success';
-        formFeedback.style.display = 'block';
-      });
+        document.getElementById('name').value = 'Kim Dokja (via Neilo)';
+        document.getElementById('subject').value = '[Star Stream] A Story Fragment Has Arrived for You';
+      }, 900);
     });
   }
 

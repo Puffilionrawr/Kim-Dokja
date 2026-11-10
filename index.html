@@ -852,28 +852,29 @@
 
           <!-- Right Column: Transmission Form -->
           <div class="contact-form-wrapper reveal-up">
-            <form id="contact-form" class="contact-form" action="https://formsubmit.co/neilofebrian@gmail.com" method="POST" novalidate>
-              <!-- FormSubmit Target & Configuration -->
-              <input type="hidden" name="_captcha" value="false">
-              <input type="hidden" name="_template" value="table">
-              <input type="hidden" name="_subject" value="[Star Stream #BI-7623] New Story Fragment for Kim Dokja">
+            <div class="sender-badge" style="display: flex; align-items: center; gap: 0.6rem; background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); padding: 0.65rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-family: var(--font-hud); font-size: 0.8rem; color: var(--primary-light);">
+              <i class="fa-solid fa-paper-plane" style="color: var(--primary-color);"></i>
+              <span>Sender: <strong>neilofebrian@gmail.com</strong> (Direct Star Stream Transmission)</span>
+            </div>
+
+            <form id="contact-form" class="contact-form" novalidate>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="name">Your Incarnation / Reader Name <span class="required">*</span></label>
+                  <label for="email">Target Recipient Email <span class="required">*</span></label>
                   <div class="input-wrapper">
-                    <i class="fa-regular fa-user input-icon"></i>
-                    <input type="text" id="name" name="name" placeholder="e.g., An Ordinary Reader" required>
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                    <input type="email" id="email" name="email" placeholder="e.g., target.recipient@gmail.com" required>
                   </div>
-                  <span class="error-msg" id="name-error"></span>
+                  <span class="error-msg" id="email-error"></span>
                 </div>
 
                 <div class="form-group">
-                  <label for="email">Star Stream Frequency / Email <span class="required">*</span></label>
+                  <label for="name">Your Incarnation / Display Name <span class="required">*</span></label>
                   <div class="input-wrapper">
-                    <i class="fa-regular fa-envelope input-icon"></i>
-                    <input type="email" id="email" name="email" placeholder="e.g., reader@starstream.net" required>
+                    <i class="fa-regular fa-user input-icon"></i>
+                    <input type="text" id="name" name="name" value="Kim Dokja (via Neilo)" placeholder="e.g., Kim Dokja / An Ordinary Reader" required>
                   </div>
-                  <span class="error-msg" id="email-error"></span>
+                  <span class="error-msg" id="name-error"></span>
                 </div>
               </div>
 
@@ -881,21 +882,21 @@
                 <label for="subject">Fable Subject</label>
                 <div class="input-wrapper">
                   <i class="fa-solid fa-scroll input-icon"></i>
-                  <input type="text" id="subject" name="subject" placeholder="e.g., To the Foolish Demon King of Salvation">
+                  <input type="text" id="subject" name="subject" value="[Star Stream] A Story Fragment Has Arrived for You" placeholder="e.g., To the Foolish Demon King of Salvation">
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="message">Your Message to Kim Dokja <span class="required">*</span></label>
+                <label for="message">Your Message to the Recipient <span class="required">*</span></label>
                 <div class="input-wrapper textarea-wrapper">
                   <i class="fa-regular fa-message input-icon"></i>
-                  <textarea id="message" name="message" rows="5" placeholder="Write your words to reach Kim Dokja on the train..." required></textarea>
+                  <textarea id="message" name="message" rows="5" placeholder="Write your words to be transmitted to the recipient's inbox..." required></textarea>
                 </div>
                 <span class="error-msg" id="message-error"></span>
               </div>
 
               <button type="submit" class="btn btn-primary btn-block" id="submit-btn">
-                <span>Transmit Story Fragment</span>
+                <span>Transmit Directly from neilofebrian@gmail.com</span>
                 <i class="fa-solid fa-paper-plane"></i>
               </button>
 
